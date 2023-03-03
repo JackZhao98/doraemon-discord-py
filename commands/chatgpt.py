@@ -8,10 +8,6 @@ class ChatGPT(commands.Cog):
         self.chatgpt = OpenAIChat(key, org)
         self.chatgpt.clear_all()
 
-    @commands.command()
-    async def c(self, ctx):
-        """Short command for `-chat`"""
-        await self.chat(ctx)
 
     @commands.command()
     async def clear(self, ctx):
@@ -25,9 +21,9 @@ class ChatGPT(commands.Cog):
         self.chatgpt.clear_all()
         await ctx.send("Cleared all chat history")
 
-    @commands.command()
+    @commands.command(name='chat', aliases=['c'])
     async def chat(self, ctx):
-        """Chat with ChatGPT"""
+        """Chat with ChatGPT. You can also use `c` as an alias."""
         # Remove command prefix and command name
         async with ctx.typing():
             message = sanitize_message(ctx.message.content, 'chat')
