@@ -3,8 +3,9 @@ from os.path import join, dirname
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-# import ./utils/openai/ChatGPT.py OpenAIChat class
-from utils.openai.ChatGPT import OpenAIChat
+from utils.utils import *
+from commands.chatgpt import ChatGPT
+
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -13,38 +14,18 @@ DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 OPENAI_API_KEY = os.environ.get('PERSONAL_OPENAI_API_KEY')
 OPENAI_ORG = os.environ.get('PERSONAL_OPENAI_ORG')
 
+print(OPENAI_API_KEY)
+
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='-', intents=intents)
-chatgpt = OpenAIChat(api_key=OPENAI_API_KEY, org=OPENAI_ORG);
+bot_description = """
+Doraemon Discord bot is a multi-purpose bot for Discord.
+It can provide `-chat` function with OpenAI ChatGPT.
+Other functions like music playing are still under development, stay tuned!
+"""
+bot = commands.Bot(command_prefix='-', intents=intents, description=bot_description)
 
-def sanitize_message(message,  command_name,prefix='-'):
-    return message.replace(prefix + command_name, '')
-
-@bot.command()
-async def clear(ctx):
-    chatgpt.clear_message(ctx.message.author.id)
-    await ctx.send(f"Cleared message for {ctx.message.author.name}")
-
-@bot.command()
-async def clearAll(ctx):
-    chatgpt.clear_all()
-    await ctx.send("Cleared all chat history")
-
-@bot.command()
-async def chat(ctx):
-    # Remove command prefix and command name
-    message = sanitize_message(ctx.message.content, 'greeting')
-    ret = chatgpt.chat(message, ctx.message.author.id)
-    await ctx.send(ret)
-
-@bot.event
-async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
 
 @bot.event
 async def on_message(message):
@@ -53,5 +34,20 @@ async def on_message(message):
     if message.content.startswith('-'):
         await bot.process_commands(message)
         return
+
+async def set_presence():
+    await bot.wait_until_ready()
+    listening = discord.Activity(type=discord.ActivityType.listening, name="-help")
+    await bot.change_presence(activity=listening)
+
+@bot.event
+async def on_ready():
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
+    await bot.add_cog(ChatGPT(key=OPENAI_API_KEY, org=OPENAI_ORG))
+    await set_presence()
+
 
 bot.run(DISCORD_TOKEN)

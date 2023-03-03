@@ -11,6 +11,9 @@ class OpenAIChat:
         openai.organization = org
         self.messages={}
 
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
     def process_message(self, message, uid):
         if uid not in self.messages.keys():
             self.messages[uid] = []
@@ -27,18 +30,30 @@ class OpenAIChat:
         request = {"role": "user", "content": message}
         self.process_message(request, uid)
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=self.messages[uid]
-        )
-        response_msg = response.choices[0].message
-        self.process_message(response_msg, uid)
+        try:
+            chatResponse = self.generate_response(
+                model_id="gpt-3.5-turbo-0301",
+                messages=self.messages[uid],
+                temperature=0.9,
+                max_tokens=2000,
+                frequency_penalty=0.5,
+                presence_penalty=0.6,
+            )
+        except openai.error.InvalidRequestError as e:
+            print(e)
+            return "请使用 `-clear` 清除历史消息并重试。 Please try to use `-clear` to clear your chat history and try again."
+
+        if len(chatResponse.choices) == 0:
+            return "请使用 `-clear` 清除历史消息并重试。 Please try to use `-clear` to clear your chat history and try again."
+        
+        response_msg = chatResponse.choices[0].message
+        self.process_message(response_msg.toDict(), uid)
         return response_msg.content
 
 
 
-    def generate_response(self, model_id, messages, temperature=1, top_p=1, n=1, stream=False, stop=None, max_tokens=1000, presence_penalty=0, frequency_penalty=0, logit_bias=None, user=None,):
-        response = openai.Completion.create(
+    def generate_response(self, model_id, messages, temperature=1, top_p=1, n=1, stream=False, stop=None, max_tokens=1000, presence_penalty=0, frequency_penalty=0,):
+        response = openai.ChatCompletion.create(
             model=model_id,
             messages=messages,
             temperature=temperature,
@@ -49,10 +64,6 @@ class OpenAIChat:
             max_tokens=max_tokens,
             frequency_penalty=frequency_penalty,
             presence_penalty=presence_penalty,
-            logit_bias=logit_bias,
-            user=user
         )
-        response_str =  json.dumps(response, indent=4)
+        response_str = json.dumps(response, indent=4)
         return create_chat_completion(response_str)
-
-
