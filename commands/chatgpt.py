@@ -1,5 +1,5 @@
 from discord.ext import commands
-from utils.openai.ChatGPT import OpenAIChat
+from utils.openai.open_ai_chat import OpenAIChat
 from utils.utils import *
 
 class ChatGPT(commands.Cog):

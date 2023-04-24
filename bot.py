@@ -11,8 +11,8 @@ dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
-OPENAI_API_KEY = os.environ.get('PERSONAL_OPENAI_API_KEY')
-OPENAI_ORG = os.environ.get('PERSONAL_OPENAI_ORG')
+OPENAI_API_KEY = os.environ.get('AIRMART_OPENAI_API_KEY')
+OPENAI_ORG = os.environ.get('AIRMART_OPENAI_ORG')
 
 print(OPENAI_API_KEY)
 

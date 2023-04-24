@@ -3,7 +3,6 @@ from utils.utils import *
 
 class Music(commands.Cog):
     """Music player"""
-    
     @commands.command()
     async def play(self, ctx):
         """Play music"""

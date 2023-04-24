@@ -17,6 +17,9 @@ class OpenAIChat:
     def process_message(self, message, uid):
         if uid not in self.messages.keys():
             self.messages[uid] = []
+        # if length of existing messages is greater than 10, remove first 2
+        if len(self.messages[uid]) >= 10:
+            self.messages[uid] = self.messages[uid][2:]
         self.messages[uid].append(message)
 
     def clear_message(self, uid):
