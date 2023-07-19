@@ -2,14 +2,14 @@ import os
 from os.path import join, dirname
 import discord
 from discord.ext import commands
-from dotenv import Dotenv
+from dotenv import load_dotenv
 from utils.utils import *
-from commands.chatgpt import ChatGPT
+from commands.chatgpt import DoraemonChatBot
 
 
 dotenv_path = join(dirname(__file__), '.env')
-dotenv = Dotenv(dotenv_path)
-os.environ.update(dotenv)
+load_dotenv(dotenv_path)
+# os.environ.update(dotenv)
 
 DISCORD_TOKEN = os.environ.get('DISCORD_TOKEN')
 OPENAI_API_KEY = os.environ.get('AIRMART_OPENAI_API_KEY')
@@ -48,7 +48,7 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------')
-    await bot.add_cog(ChatGPT(key=OPENAI_API_KEY, org=OPENAI_ORG, model=GPT_MODEL))
+    await bot.add_cog(DoraemonChatBot(key=OPENAI_API_KEY, org=OPENAI_ORG, model=GPT_MODEL))
     await set_presence()
 
 
