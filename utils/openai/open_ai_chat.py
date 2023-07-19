@@ -4,9 +4,10 @@ import json
 from utils.openai.openai_helper import create_chat_completion
 
 class OpenAIChat:
-    def __init__(self, api_key, org):
+    def __init__(self, api_key, org, model):
         self.api_key = api_key
         self.org = org
+        self.model = model
         openai.api_key = api_key
         openai.organization = org
         self.messages={}
@@ -35,7 +36,7 @@ class OpenAIChat:
 
         try:
             chatResponse = self.generate_response(
-                model_id="gpt-3.5-turbo-0301",
+                model_id=self.model,
                 messages=self.messages[uid],
                 temperature=0.9,
                 max_tokens=2000,

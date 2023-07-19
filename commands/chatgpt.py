@@ -4,10 +4,14 @@ from utils.utils import *
 
 class ChatGPT(commands.Cog):
     """Chat with Doraemon Discord bot!"""
-    def __init__(self, key, org):
-        self.chatgpt = OpenAIChat(key, org)
+    def __init__(self, key, org, model):
+        self.chatgpt = OpenAIChat(key, org, model)
         self.chatgpt.clear_all()
-
+    
+    @commands.command()
+    async def gpt_info(self, ctx):
+        """Display current Chat-GPT model"""
+        await ctx.send(f"老子是哆啦A梦，现在正在使用：{self.chatgpt.model}")
 
     @commands.command()
     async def clear(self, ctx):
@@ -27,5 +31,8 @@ class ChatGPT(commands.Cog):
         # Remove command prefix and command name
         async with ctx.typing():
             message = sanitize_message(ctx.message.content, 'chat')
-            ret = self.chatgpt.chat(message, ctx.message.author.id)
-            await ctx.send(ret)
+            try:
+                ret = self.chatgpt.chat(message, ctx.message.author.id)
+                await ctx.send(ret)
+            except:
+                await ctx.send("结果超时，可能问题过长")
